@@ -143,18 +143,6 @@ class SidePanelApp:
         self.load_notepad()
         notebook.add(notepad_frame, text="Notepad")
 
-        # Browser tab
-        browser_frame = tk.Frame(notebook, bg="white")
-        url_frame = tk.Frame(browser_frame, bg="white")
-        url_frame.pack(fill="x", padx=10, pady=(10,0))
-        self.url_var = tk.StringVar()
-        url_entry = tk.Entry(url_frame, textvariable=self.url_var, font=("Arial", 12))
-        url_entry.pack(side="left", fill="x", expand=True)
-        tk.Button(url_frame, text="Go", command=self.open_in_browser).pack(side="left", padx=5)
-        info_label = tk.Label(browser_frame, text="Opens the URL in your default browser.", bg="white", fg="gray30", font=("Arial", 10))
-        info_label.pack(padx=10, pady=10)
-        notebook.add(browser_frame, text="Browser")
-
         # To-Do tab
         todo_frame = tk.Frame(notebook, bg="white")
         self.todo_items = []
@@ -210,14 +198,6 @@ class SidePanelApp:
                 f.write(content.rstrip())
             self.text_area.edit_modified(False)
 
-    def open_in_browser(self):
-        url = self.url_var.get().strip()
-        if not url:
-            return
-        if not url.startswith("http"):
-            url = "http://" + url
-        webbrowser.open(url)
-
     # --- To-Do List Methods ---
 
     def load_todo_items(self):
@@ -258,7 +238,6 @@ class SidePanelApp:
         btn.pack(anchor="e", pady=2)
         self.todo_items.append(text)
         self.todo_vars.append(var)
-
         if save:
             self.save_todo_items()
 
@@ -277,7 +256,6 @@ class SidePanelApp:
         if idx is not None:
             self.todo_items.pop(idx)
             self.todo_vars.pop(idx)
-
         cb.destroy()
         btn.destroy()
         # Remove from Apple Reminders if on macOS

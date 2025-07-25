@@ -83,6 +83,14 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 
 ---
 
+## Data
+
+- - The notes, todos, and timers are stored as plain `.txt` files in a user-specific application data directory:
+    - **Windows:** `C:\Users\<YourUsername>\AppData\Local\myoverlay\`
+    - **macOS:** `/Users/<YourUsername>/Library/Application Support/myoverlay/`
+    - **Linux:** `/home/<yourusername>/.local/share/myoverlay/`
+
+---
 ## Disclaimer
 
 - Made with the help of AI

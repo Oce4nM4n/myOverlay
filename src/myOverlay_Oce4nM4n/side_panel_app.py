@@ -28,9 +28,11 @@ def get_screen_geometry():
     return width, height
 
 def is_mac():
+    # Check if macOS to ensure compatibility with Apple Reminders
     return sys.platform == "darwin"
 
 def add_reminder_applescript(task):
+    # Use AppleScript to add a reminder
     script = f'''
     tell application "Reminders"
         set newReminder to make new reminder with properties {{name:"{task}"}}
@@ -42,6 +44,7 @@ def add_reminder_applescript(task):
         print(f"Error adding reminder: {e}")
 
 def complete_reminder_applescript(task):
+    # Use AppleScript to complete a reminder
     script = f'''
     tell application "Reminders"
         set theReminders to reminders whose name is "{task}" and completed is false
@@ -56,6 +59,7 @@ def complete_reminder_applescript(task):
         print(f"Error completing reminder: {e}")
 
 def delete_reminder_applescript(task):
+    # Use AppleScript to delete a reminder
     script = f'''
     tell application "Reminders"
         set theReminders to reminders whose name is "{task}" and completed is false
@@ -70,6 +74,9 @@ def delete_reminder_applescript(task):
         print(f"Error deleting reminder: {e}")
 
 def parse_date(date_str):
+    """ Parse a date string in various formats.
+    Returns a datetime object or None if parsing fails.
+    """
     # Try several formats
     for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%B %d, %Y", "%d %B %Y", "%b %d, %Y", "%d %b %Y"):
         try:
@@ -84,7 +91,9 @@ def parse_date(date_str):
     return None
 
 class SidePanelApp:
+    """ Main application class for the side panel overlay. """
     def __init__(self):
+        # Initialize screen dimensions and button size
         self.screen_width, self.screen_height = get_screen_geometry()
         self.button_width = 40
         self.button_height = 120
@@ -111,6 +120,7 @@ class SidePanelApp:
         self.root.after(1000, self.update_timer)
 
     def animate_and_open_panel(self, event):
+        """ Animate the button and open the side panel. """
         # Animate: flash color
         self.button.itemconfig("rect", fill="gray80")
         self.root.update()
@@ -120,6 +130,7 @@ class SidePanelApp:
         self.open_panel()
 
     def open_panel(self):
+        """ Open the side panel with tabs for notepads, to-do lists, and countdown timers. """
         if self.panel is not None:
             return  # Already open
 
@@ -166,6 +177,7 @@ class SidePanelApp:
     # --- Multiple Notepads ---
 
     def setup_notepad_tab(self, frame):
+        """ Setup the notepad tab with a combobox for selecting notepads. """
         top = tk.Frame(frame, bg="white")
         top.pack(fill="x", padx=10, pady=(10, 0))
 
@@ -191,15 +203,18 @@ class SidePanelApp:
         self.load_selected_notepad()
 
     def get_notepad_names(self):
+        """ Get a sorted list of notepad names from the notepad directory. """
         files = os.listdir(NOTEPAD_DIR)
         names = [f[:-4] for f in files if f.endswith(".txt")]
         return sorted(names) if names else []
 
     def notepad_file(self, name):
+        """ Get the file path for a notepad by name. """
         safe = "".join(c for c in name if c.isalnum() or c in (' ', '_', '-')).rstrip()
         return os.path.join(NOTEPAD_DIR, f"{safe}.txt")
 
     def load_selected_notepad(self, event=None):
+        """ Load the currently selected notepad into the text area. """
         name = self.current_notepad.get()
         file = self.notepad_file(name)
         self.text_area.delete("1.0", tk.END)
@@ -209,6 +224,7 @@ class SidePanelApp:
         self.text_area.edit_modified(False)
 
     def save_current_notepad(self, event=None):
+        """ Save the current notepad if it has been modified. """
         if self.text_area.edit_modified():
             name = self.current_notepad.get()
             content = self.text_area.get("1.0", tk.END)
@@ -216,11 +232,13 @@ class SidePanelApp:
             self.text_area.edit_modified(False)
 
     def save_notepad(self, name, content):
+        """ Save the notepad content to a file. """
         file = self.notepad_file(name)
         with open(file, "w", encoding="utf-8") as f:
             f.write(content.rstrip())
 
     def create_new_notepad(self):
+        """ Create a new notepad with a user-defined name. """
         name = simpledialog.askstring("New Notepad", "Enter notepad name:", parent=self.panel)
         if not name:
             return
@@ -235,6 +253,7 @@ class SidePanelApp:
         self.load_selected_notepad()
 
     def delete_current_notepad(self):
+        """ Delete the currently selected notepad after confirmation. """
         name = self.current_notepad.get()
         if len(self.notepad_names) == 1:
             messagebox.showerror("Error", "At least one notepad must exist.")
@@ -253,6 +272,7 @@ class SidePanelApp:
     # --- To-Do List Methods ---
 
     def setup_todo_tab(self, frame):
+        """ Setup the to-do list tab with a frame for items and an entry for new tasks."""
         self.todo_items = []
         self.todo_vars = []
         self.todo_frame_inner = tk.Frame(frame, bg="white")
@@ -269,6 +289,7 @@ class SidePanelApp:
         tk.Button(add_frame, text="Open Reminders", command=self.open_apple_reminders).pack(side="left", padx=5)
 
     def load_todo_items(self):
+        """ Loads to-do items from the file and populates the todo list. """
         self.todo_items.clear()
         self.todo_vars.clear()
         for widget in self.todo_frame_inner.winfo_children():
@@ -285,12 +306,14 @@ class SidePanelApp:
         self.save_todo_items()
 
     def save_todo_items(self):
+        """ Saves the current to-do items to the file."""
         with open(TODO_FILE, "w", encoding="utf-8") as f:
             for var, text in zip(self.todo_vars, self.todo_items):
                 prefix = "[x] " if var.get() else "[ ] "
                 f.write(prefix + text + "\n")
 
     def add_todo_item(self, text=None, checked=False, save=True):
+        """ Adds a new to-do item to the list and optionally saves it."""
         if text is None:
             text = self.new_task_var.get().strip()
             if not text:
@@ -310,12 +333,14 @@ class SidePanelApp:
             self.save_todo_items()
 
     def toggle_todo_item(self, var, text):
+        """ Toggle the completion state of a to-do item."""
         # If checked, mark as done in Reminders
         if var.get() and is_mac():
             complete_reminder_applescript(text)
         self.save_todo_items()
 
     def remove_todo_item(self, cb, btn, var, text):
+        """ Remove a to-do item from the list and the file."""
         idx = None
         for i, (v, t) in enumerate(zip(self.todo_vars, self.todo_items)):
             if v == var and t == text:
@@ -332,6 +357,7 @@ class SidePanelApp:
         self.save_todo_items()
 
     def open_apple_reminders(self):
+        """ Open Apple Reminders application if on macOS."""
         if is_mac():
             try:
                 subprocess.Popen(["open", "-a", "Reminders"])
@@ -343,6 +369,7 @@ class SidePanelApp:
     # --- Multiple Timers ---
 
     def setup_timer_tab(self, frame):
+        """ Setup the countdown timer tab with a frame for timers and controls to add/delete timers."""
         self.timers = self.load_timers()
         self.timer_vars = {}
         self.timer_labels = {}
@@ -360,6 +387,7 @@ class SidePanelApp:
         tk.Button(add_frame, text="Add Timer", command=self.add_timer_dialog).pack(side="left", padx=5)
 
     def render_timers(self):
+        """ Render the timers in the timers tab."""
         for widget in self.timers_frame.winfo_children():
             widget.destroy()
         self.timer_vars.clear()
@@ -370,6 +398,7 @@ class SidePanelApp:
             self.add_timer_row(name, date_str, idx)
 
     def add_timer_row(self, name, date_str, idx):
+        """ Add a row for a timer with name, countdown, date entry, and delete button."""
         # Outer frame for each timer
         timer_outer = tk.Frame(self.timers_frame, bg="white")
         timer_outer.pack(fill="x", expand=True, pady=(0, 0))
@@ -424,16 +453,19 @@ class SidePanelApp:
 
 
     def _clear_placeholder(self, var, entry, placeholder):
+        """ Clear the placeholder text when the entry is focused."""
         if var.get() == placeholder:
             var.set("")
             entry.config(fg="black", bg="white")
 
     def _add_placeholder(self, var, entry, placeholder):
+        """ Add the placeholder text if the entry is empty when focus is lost."""
         if not var.get():
             var.set(placeholder)
             entry.config(fg="gray", bg="#f0f0f0")
 
     def add_timer_dialog(self):
+        """ Open a dialog to add a new timer with a name."""
         name = simpledialog.askstring("New Timer", "Enter timer name:", parent=self.panel)
         if not name:
             return
@@ -446,12 +478,14 @@ class SidePanelApp:
         self.render_timers()
 
     def delete_timer(self, name):
+        """ Delete a timer by name after confirmation."""
         if name in self.timers:
             del self.timers[name]
             self.save_timers()
             self.render_timers()
 
     def set_timer_target(self, name, var):
+        """ Set the target date for a timer."""
         date_str = var.get().strip()
         placeholder = "YYYY-MM-DD"
         if date_str == placeholder:
@@ -466,6 +500,7 @@ class SidePanelApp:
         self.timer_status_labels[name].config(text="")
 
     def update_timer(self):
+        """ Update the countdown timers every second."""
         # Only update if panel is open and timer_labels exist
         if getattr(self, "panel_open", False) and hasattr(self, "timer_labels"):
             now = datetime.now()
@@ -493,6 +528,7 @@ class SidePanelApp:
         self.root.after(1000, self.update_timer)
 
     def load_timers(self):
+        """ Load timers from the timers file."""
         timers = {}
         if os.path.exists(TIMERS_FILE):
             with open(TIMERS_FILE, "r", encoding="utf-8") as f:
@@ -503,6 +539,7 @@ class SidePanelApp:
         return timers
 
     def save_timers(self):
+        """ Save the current timers to the timers file."""
         with open(TIMERS_FILE, "w", encoding="utf-8") as f:
             for name, date_str in self.timers.items():
                 f.write(f"{name}::{date_str}\n")
@@ -510,6 +547,7 @@ class SidePanelApp:
     # --- End Countdown Timer Methods ---
 
     def close_panel(self):
+        """ Close the side panel and restore the button window."""
         if self.panel is not None:
             self.panel.destroy()
             self.panel = None

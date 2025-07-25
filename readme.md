@@ -1,7 +1,7 @@
 # SidePanelApp
 
 A macOS-friendly Python/Tkinter floating sidebar with:
-- **Always-on-top, semi-transparent button** on the right edge of the screen
+- **Always-on-top, semi-transparent button** on the right edge of the screen made with the help of AI
 - **Notepad** tab (auto-saves to file)
 - **To-Do list** tab with Apple Reminders integration (add, complete, and remove tasks)
 - **Countdown Timer** tab (counts down to a specified date)
@@ -51,11 +51,11 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 
 ## Apple Reminders Integration
 
-- **macOS only:**  
+- **macOS only:**
   - Adding a task in the To-Do tab also adds it to Reminders.
   - Checking a task marks it as completed in Reminders.
   - Removing a task deletes it from Reminders.
-- **Other platforms:**  
+- **Other platforms:**
   - The To-Do tab works locally, but Reminders sync don't.
 
 ---

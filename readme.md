@@ -2,9 +2,9 @@
 
 A macOS-friendly Python/Tkinter floating sidebar with:
 - **Always-on-top, semi-transparent button** on the right edge of the screen
-- **Notepad** tab (auto-saves to file)
+- **Notepads** tab (auto-saves your notes to files)
 - **To-Do list** tab with Apple Reminders integration (add, complete, and remove tasks)
-- **Countdown Timer** tab (counts down to a specified date)
+- **Countdown Timers** tab (with seperate timers which count down to a specified date)
 
 ---
 
@@ -14,7 +14,10 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 - **Notepad:** Write quick notes, auto-saved to `sidepanel_notepad.txt`.
 - **To-Do List:** Add, check off, and remove tasks. Tasks are synced with Apple Reminders on macOS.
 - **Countdown Timer:** Enter a target date and see a live countdown in days, hours, minutes, and seconds.
-- **All data is saved locally and restored between sessions.**
+- **All data is saved locally and restored between sessions:** The notes, todos, and timers are stored as plain `.txt` files in a user-specific application data directory:
+    - **Windows:** `C:\Users\<YourUsername>\AppData\Local\myoverlay\`
+    - **macOS:** `/Users/<YourUsername>/Library/Application Support/myoverlay/`
+    - **Linux:** `/home/<yourusername>/.local/share/myoverlay/`
 
 ---
 
@@ -28,18 +31,23 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 
 ## Run with pypi
 
-1. pip3 install myoverlay_oce4nm4n
+1. **Run:**
+```sh
+    pip install myoverlay_oce4nm4n
+    ```
 
-2. in the command line run:
+2. **Run:**
 	```sh
     myOverlay
     ```
 
-	or
+	**or**
 
 	```sh
-    python3 -m myoverlay_oce4nm4n
+    python -m myoverlay_oce4nm4n
     ```
+
+	**if macos then it is pip3 and python3**
 
 ## Download script and run
 
@@ -81,16 +89,10 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 - If you cannot type in the sidebar, ensure you are not running the sidebar in "overrideredirect" mode (the provided code disables this for the sidebar panel).
 - On macOS, the first time you run the app, you may be prompted for Automation permissions for AppleScript Reminders integration.
 
----
-
-## Data
-
-- - The notes, todos, and timers are stored as plain `.txt` files in a user-specific application data directory:
-    - **Windows:** `C:\Users\<YourUsername>\AppData\Local\myoverlay\`
-    - **macOS:** `/Users/<YourUsername>/Library/Application Support/myoverlay/`
-    - **Linux:** `/home/<yourusername>/.local/share/myoverlay/`
 
 ---
+
+
 ## Disclaimer
 
 - Made with the help of AI

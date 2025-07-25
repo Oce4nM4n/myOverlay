@@ -4,10 +4,20 @@ import os
 import subprocess
 import sys
 from datetime import datetime, timedelta
+import appdirs
 
-NOTEPAD_DIR = "sidepanel_notepads"
-TODO_FILE = "sidepanel_todo.txt"
-TIMERS_FILE = "sidepanel_timers.txt"
+APP_NAME = "myoverlay"
+APP_AUTHOR = "oce4nm4n"
+
+# Use appdirs to get a user-specific, OS-appropriate data directory
+DATA_DIR = appdirs.user_data_dir(APP_NAME, APP_AUTHOR)
+os.makedirs(DATA_DIR, exist_ok=True)
+
+NOTEPAD_DIR = os.path.join(DATA_DIR, "sidepanel_notepads")
+os.makedirs(NOTEPAD_DIR, exist_ok=True)
+
+TODO_FILE = os.path.join(DATA_DIR, "sidepanel_todo.txt")
+TIMERS_FILE = os.path.join(DATA_DIR, "sidepanel_timers.txt")
 
 def get_screen_geometry():
     root = tk.Tk()
@@ -79,9 +89,6 @@ class SidePanelApp:
         self.button_width = 40
         self.button_height = 120
         self.panel_open = False
-
-        # Ensure notepad directory exists
-        os.makedirs(NOTEPAD_DIR, exist_ok=True)
 
         # Main root for the button
         self.root = tk.Tk()

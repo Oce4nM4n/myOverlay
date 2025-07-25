@@ -1,7 +1,7 @@
 # SidePanelApp
 
 A macOS-friendly Python/Tkinter floating sidebar with:
-- **Always-on-top, semi-transparent button** on the right edge of the screen made with the help of AI
+- **Always-on-top, semi-transparent button** on the right edge of the screen
 - **Notepad** tab (auto-saves to file)
 - **To-Do list** tab with Apple Reminders integration (add, complete, and remove tasks)
 - **Countdown Timer** tab (counts down to a specified date)
@@ -21,12 +21,27 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 ## Requirements
 
 - Python 3.7+
-- macOS recommended for Reminders integration (other platforms work, but Reminders sync is disabled)
+- macOS recommended for Reminders integration (other platforms may work, but Reminders sync is disabled)
 - No external dependencies required
 
 ---
 
-## Usage
+## Run with pypi
+
+1. pip3 install myoverlay_oce4nm4n
+
+2. in the command line run:
+	```sh
+    myOverlay
+    ```
+
+	or
+
+	```sh
+    python3 -m myoverlay_oce4nm4n
+    ```
+
+## Download script and run
 
 1. **Clone or copy the script:**
     ```sh
@@ -65,3 +80,9 @@ A macOS-friendly Python/Tkinter floating sidebar with:
 
 - If you cannot type in the sidebar, ensure you are not running the sidebar in "overrideredirect" mode (the provided code disables this for the sidebar panel).
 - On macOS, the first time you run the app, you may be prompted for Automation permissions for AppleScript Reminders integration.
+
+---
+
+## Disclaimer
+
+- Made with the help of AI

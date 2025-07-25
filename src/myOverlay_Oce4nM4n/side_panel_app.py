@@ -349,6 +349,7 @@ class SidePanelApp:
         self.timer_entries = {}
         self.timer_status_labels = {}
 
+        # Make the timers_frame expand horizontally
         self.timers_frame = tk.Frame(frame, bg="white")
         self.timers_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -365,28 +366,72 @@ class SidePanelApp:
         self.timer_labels.clear()
         self.timer_entries.clear()
         self.timer_status_labels.clear()
-        for name, date_str in self.timers.items():
-            self.add_timer_row(name, date_str)
+        for idx, (name, date_str) in enumerate(self.timers.items()):
+            self.add_timer_row(name, date_str, idx)
 
-    def add_timer_row(self, name, date_str):
-        row = tk.Frame(self.timers_frame, bg="white")
-        row.pack(fill="x", pady=5)
+    def add_timer_row(self, name, date_str, idx):
+        # Outer frame for each timer
+        timer_outer = tk.Frame(self.timers_frame, bg="white")
+        timer_outer.pack(fill="x", expand=True, pady=(0, 0))
 
-        tk.Label(row, text=name, font=("Arial", 12, "bold"), bg="white").pack(side="left", padx=5)
-        var = tk.StringVar(value=date_str)
-        entry = tk.Entry(row, textvariable=var, font=("Arial", 12), width=15)
+        # --- Row 1: Name, Countdown, Delete ---
+        row1 = tk.Frame(timer_outer, bg="white")
+        row1.pack(fill="x", expand=True)
+
+        # Name label
+        tk.Label(row1, text=name, font=("Arial", 12, "bold"), bg="white").pack(side="left", padx=5)
+
+        # Countdown label (expands)
+        label = tk.Label(row1, text="", font=("Consolas", 18, "bold"), bg="white", fg="black")
+        label.pack(side="left", padx=10, fill="x", expand=True)
+
+        # Delete button (right-aligned)
+        tk.Button(row1, text="Delete", command=lambda n=name: self.delete_timer(n)).pack(side="right", padx=5)
+
+        # --- Row 2: Date entry, Set, Status ---
+        row2 = tk.Frame(timer_outer, bg="white")
+        row2.pack(fill="x", expand=True, pady=(0, 5))
+
+        # Date entry with placeholder
+        var = tk.StringVar()
+        entry = tk.Entry(row2, textvariable=var, font=("Arial", 12), width=15)
+        placeholder = "YYYY-MM-DD"
+        if not date_str:
+            var.set(placeholder)
+            entry.config(fg="gray", bg="#f0f0f0")
+        else:
+            var.set(date_str)
+            entry.config(fg="black", bg="white")
         entry.pack(side="left", padx=5)
-        tk.Button(row, text="Set", command=lambda n=name, v=var: self.set_timer_target(n, v)).pack(side="left", padx=5)
-        label = tk.Label(row, text="", font=("Consolas", 18, "bold"), bg="white", fg="black")
-        label.pack(side="left", padx=10)
-        status = tk.Label(row, text="", font=("Arial", 10), bg="white", fg="red")
+        entry.bind("<FocusIn>", lambda e, v=var, ent=entry: self._clear_placeholder(v, ent, placeholder))
+        entry.bind("<FocusOut>", lambda e, v=var, ent=entry: self._add_placeholder(v, ent, placeholder))
+
+        # Set button
+        tk.Button(row2, text="Set", command=lambda n=name, v=var: self.set_timer_target(n, v)).pack(side="left", padx=5)
+
+        # Status label
+        status = tk.Label(row2, text="", font=("Arial", 10), bg="white", fg="red")
         status.pack(side="left", padx=5)
-        tk.Button(row, text="Delete", command=lambda n=name: self.delete_timer(n)).pack(side="right", padx=5)
+
+        # Separator
+        sep = ttk.Separator(self.timers_frame, orient="horizontal")
+        sep.pack(fill="x", pady=2)
 
         self.timer_vars[name] = var
         self.timer_labels[name] = label
         self.timer_entries[name] = entry
         self.timer_status_labels[name] = status
+
+
+    def _clear_placeholder(self, var, entry, placeholder):
+        if var.get() == placeholder:
+            var.set("")
+            entry.config(fg="black", bg="white")
+
+    def _add_placeholder(self, var, entry, placeholder):
+        if not var.get():
+            var.set(placeholder)
+            entry.config(fg="gray", bg="#f0f0f0")
 
     def add_timer_dialog(self):
         name = simpledialog.askstring("New Timer", "Enter timer name:", parent=self.panel)
@@ -408,6 +453,10 @@ class SidePanelApp:
 
     def set_timer_target(self, name, var):
         date_str = var.get().strip()
+        placeholder = "YYYY-MM-DD"
+        if date_str == placeholder:
+            self.timer_status_labels[name].config(text="Please enter a date.")
+            return
         dt = parse_date(date_str)
         if not dt:
             self.timer_status_labels[name].config(text="Invalid date format. Try YYYY-MM-DD or 31/08/2025.")
@@ -422,6 +471,10 @@ class SidePanelApp:
             now = datetime.now()
             for name, var in self.timer_vars.items():
                 date_str = var.get().strip()
+                placeholder = "YYYY-MM-DD"
+                if date_str == placeholder:
+                    self.timer_labels[name].config(text="Set a date.")
+                    continue
                 target = parse_date(date_str)
                 label = self.timer_labels[name]
                 if target:
